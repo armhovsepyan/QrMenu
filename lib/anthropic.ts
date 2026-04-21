@@ -1,14 +1,17 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-})
+export const anthropic = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null
 
 export async function generateMenuDescriptions(
   name_ru: string,
   name_hy: string,
   name_en: string
 ): Promise<{ description_ru: string; description_hy: string; description_en: string }> {
+  if (!anthropic) {
+    throw new Error('ANTHROPIC_API_KEY is not configured')
+  }
   const message = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 512,

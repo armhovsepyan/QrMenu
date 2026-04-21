@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
+import { useDashboardLang } from '@/lib/dashboard-lang'
 
 type Category = { id: string; name_ru: string }
 type Item = {
@@ -31,6 +32,7 @@ type Props = {
 }
 
 export default function ItemForm({ categories, item, defaultCategoryId, nextPosition, onSaved, onCancel }: Props) {
+  const { t } = useDashboardLang()
   const [form, setForm] = useState({
     category_id: item?.category_id || defaultCategoryId || categories[0]?.id || '',
     name_ru: item?.name_ru || '',
@@ -55,7 +57,7 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
 
   async function generateDescriptions() {
     if (!form.name_ru && !form.name_hy && !form.name_en) {
-      toast.error('Նշեք ապրանքի անվանումը գոնե մեկ լեզվով')
+      toast.error(t.dEnterNameHint)
       return
     }
     setGeneratingAI(true)
@@ -73,9 +75,9 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
         description_hy: data.description_hy || prev.description_hy,
         description_en: data.description_en || prev.description_en,
       }))
-      toast.success('Նկարագրությունները ստեղծված են!')
+      toast.success(t.dDescGenerated)
     } catch (err) {
-      toast.error('Գեներացիայի սխալ: ' + (err as Error).message)
+      toast.error(t.dGenerationError + ': ' + (err as Error).message)
     }
     setGeneratingAI(false)
   }
@@ -96,15 +98,15 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
 
     const res = await fetch('/api/upload-image', { method: 'POST', body: formData })
     const data = await res.json()
-    if (!res.ok) { toast.error('Բեռնելու սխալ'); setUploadingImage(false); return }
+    if (!res.ok) { toast.error(t.dUploadError); setUploadingImage(false); return }
     setForm(prev => ({ ...prev, image_url: data.url }))
-    toast.success('Լուսանկարը բեռնված է!')
+    toast.success(t.dImageUploaded)
     setUploadingImage(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.name_ru.trim()) { toast.error('Նշեք անվանումը (RU)'); return }
+    if (!form.name_ru.trim()) { toast.error(t.dEnterNameRu); return }
     setSaving(true)
     const supabase = createClient()
 
@@ -124,60 +126,56 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
 
     if (item) {
       const { data, error } = await supabase.from('items').update(payload).eq('id', item.id).select().single()
-      if (error) { toast.error('Պահպանելու սխալ'); setSaving(false); return }
-      toast.success('Ապրանքը թարմացված է')
+      if (error) { toast.error(t.dSaveError); setSaving(false); return }
+      toast.success(t.dItemUpdated)
       onSaved(data)
     } else {
       const { data, error } = await supabase.from('items').insert({ ...payload, position: nextPosition }).select().single()
-      if (error) { toast.error('Ստեղծելու սխալ'); setSaving(false); return }
-      toast.success('Ապրանքը ավելացված է')
+      if (error) { toast.error(t.dSaveError); setSaving(false); return }
+      toast.success(t.dItemAdded)
       onSaved(data)
     }
     setSaving(false)
   }
 
-  const inputClass = "w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 dark:focus:ring-orange-500 transition-shadow"
-  const textareaClass = "flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 dark:focus:ring-orange-500 resize-none transition-shadow"
+  const formStr = form as unknown as Record<string, string>
+  const inputCls = "w-full px-3 py-2 rounded-lg text-sm bg-lp-surface2 border border-lp-border text-lp-text placeholder-lp-muted outline-none transition-all"
+  const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => { e.currentTarget.style.borderColor = '#4f8ef7' }
+  const onBlur  = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => { e.currentTarget.style.borderColor = '#1f2435' }
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-orange-100 dark:border-orange-500/30 rounded-2xl p-6 shadow-sm">
-      <h2 className="font-semibold text-gray-900 dark:text-white mb-5">
-        {item ? 'Խմբագրել Ապրանքը' : 'Նոր Ապրանք'}
+    <div className="bg-lp-surface border border-lp-accent/30 rounded-2xl p-6" style={{ boxShadow: '0 8px 40px rgba(0,0,0,.3)' }}>
+      <h2 className="font-semibold text-lp-text mb-5">
+        {item ? t.dEditItem : t.dNewItem}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-5">
 
         {/* Category */}
         <div>
-          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5 font-medium uppercase tracking-wide">կատեգորիա</label>
-          <select
-            value={form.category_id}
-            onChange={e => update('category_id', e.target.value)}
-            className={inputClass}
-          >
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>{cat.name_ru}</option>
-            ))}
+          <label className="block text-xs text-lp-muted mb-1.5 font-semibold uppercase tracking-widest">{t.dCategory}</label>
+          <select value={form.category_id} onChange={e => update('category_id', e.target.value)}
+            onFocus={onFocus} onBlur={onBlur} className={inputCls}>
+            {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name_ru}</option>)}
           </select>
         </div>
 
         {/* Names */}
         <div>
-          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium uppercase tracking-wide">Անվանում</label>
+          <label className="block text-xs text-lp-muted mb-2 font-semibold uppercase tracking-widest">{t.dName}</label>
           <div className="space-y-2">
             {[
               { key: 'name_ru', label: 'RU *', placeholder: 'Название товара' },
-              { key: 'name_hy', label: 'HY', placeholder: 'Ապրանքի անվանում' },
+              { key: 'name_hy', label: 'HY', placeholder: 'Ապրանքի անվանումը' },
               { key: 'name_en', label: 'EN', placeholder: 'Product name' },
             ].map(f => (
               <div key={f.key} className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-400 dark:text-gray-500 w-8 flex-shrink-0">{f.label}</span>
-                <input
-                  value={(form as unknown as Record<string, string>)[f.key]}
+                <span className="text-xs font-semibold text-lp-muted w-8 flex-shrink-0">{f.label}</span>
+                <input value={formStr[f.key]}
                   onChange={e => update(f.key, e.target.value)}
                   placeholder={f.placeholder}
                   required={f.key === 'name_ru'}
-                  className={inputClass}
-                />
+                  onFocus={onFocus} onBlur={onBlur}
+                  className={inputCls} />
               </div>
             ))}
           </div>
@@ -186,32 +184,27 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
         {/* Descriptions */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Նկարագրություն</label>
-            <button
-              type="button"
-              onClick={generateDescriptions}
-              disabled={generatingAI}
-              className="flex items-center gap-1.5 text-xs bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors disabled:opacity-50"
-            >
+            <label className="text-xs text-lp-muted font-semibold uppercase tracking-widest">{t.dDescription}</label>
+            <button type="button" onClick={generateDescriptions} disabled={generatingAI}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-lp-accent2/30 text-lp-accent2 hover:bg-lp-accent2/10 transition-colors disabled:opacity-50">
               <span>✨</span>
-              {generatingAI ? 'Խմբագրում...' : 'Խմբագրել AI-ով'}
+              {generatingAI ? t.dGenerating : t.dAiDesc}
             </button>
           </div>
           <div className="space-y-2">
             {[
               { key: 'description_ru', label: 'RU', placeholder: 'Описание товара...' },
-              { key: 'description_hy', label: 'HY', placeholder: 'Ապրանքի նկարագրություն...' },
+              { key: 'description_hy', label: 'HY', placeholder: 'Նկarагрутюн...' },
               { key: 'description_en', label: 'EN', placeholder: 'Product description...' },
             ].map(f => (
               <div key={f.key} className="flex items-start gap-2">
-                <span className="text-xs font-medium text-gray-400 dark:text-gray-500 w-8 flex-shrink-0 pt-2.5">{f.label}</span>
-                <textarea
-                  value={(form as unknown as Record<string, string>)[f.key]}
+                <span className="text-xs font-semibold text-lp-muted w-8 flex-shrink-0 pt-2.5">{f.label}</span>
+                <textarea value={formStr[f.key]}
                   onChange={e => update(f.key, e.target.value)}
                   placeholder={f.placeholder}
                   rows={2}
-                  className={textareaClass}
-                />
+                  onFocus={onFocus} onBlur={onBlur}
+                  className="flex-1 px-3 py-2 rounded-lg text-sm bg-lp-surface2 border border-lp-border text-lp-text placeholder-lp-muted outline-none resize-none transition-all" />
               </div>
             ))}
           </div>
@@ -220,23 +213,15 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
         {/* Price & Currency */}
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5 font-medium uppercase tracking-wide">Գին</label>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={form.price}
+            <label className="block text-xs text-lp-muted mb-1.5 font-semibold uppercase tracking-widest">{t.dPrice}</label>
+            <input type="number" min="0" step="0.01" value={form.price}
               onChange={e => update('price', e.target.value)}
-              className={inputClass}
-            />
+              onFocus={onFocus} onBlur={onBlur} className={inputCls} />
           </div>
           <div className="w-28">
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5 font-medium uppercase tracking-wide">Արժութ</label>
-            <select
-              value={form.currency}
-              onChange={e => update('currency', e.target.value)}
-              className={inputClass}
-            >
+            <label className="block text-xs text-lp-muted mb-1.5 font-semibold uppercase tracking-widest">{t.dCurrency}</label>
+            <select value={form.currency} onChange={e => update('currency', e.target.value)}
+              onFocus={onFocus} onBlur={onBlur} className={inputCls}>
               <option value="AMD">AMD ֏</option>
               <option value="RUB">RUB ₽</option>
               <option value="USD">USD $</option>
@@ -247,29 +232,22 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
 
         {/* Image */}
         <div>
-          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5 font-medium uppercase tracking-wide">Լուսանկար</label>
+          <label className="block text-xs text-lp-muted mb-1.5 font-semibold uppercase tracking-widest">{t.dPhoto}</label>
           <div className="flex items-center gap-3">
             {form.image_url ? (
-              <img src={form.image_url} alt="Item" className="w-16 h-16 rounded-lg object-cover border border-gray-100 dark:border-gray-700" />
+              <img src={form.image_url} alt="Item" className="w-16 h-16 rounded-lg object-cover border border-lp-border" />
             ) : (
-              <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl">📷</div>
+              <div className="w-16 h-16 rounded-lg bg-lp-surface2 border border-lp-border flex items-center justify-center text-2xl">📷</div>
             )}
             <div>
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                disabled={uploadingImage}
-                className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
-              >
-                {uploadingImage ? 'Բեռնում...' : form.image_url ? 'Փոխել լուսանկարը' : 'Բեռնել լուսանկար'}
+              <button type="button" onClick={() => fileRef.current?.click()} disabled={uploadingImage}
+                className="text-sm bg-lp-surface2 border border-lp-border text-lp-text px-3 py-2 rounded-lg hover:border-lp-accent/50 hover:text-lp-accent transition-colors disabled:opacity-50">
+                {uploadingImage ? t.dUploading : form.image_url ? t.dChangePhoto : t.dUploadPhoto}
               </button>
               {form.image_url && (
-                <button
-                  type="button"
-                  onClick={() => update('image_url', '')}
-                  className="block mt-1 text-xs text-red-400 hover:text-red-500 transition-colors"
-                >
-                  Հեռացնել լուսանկարը
+                <button type="button" onClick={() => update('image_url', '')}
+                  className="block mt-1 text-xs text-red-400 hover:text-red-300 transition-colors">
+                  {t.dRemovePhoto}
                 </button>
               )}
             </div>
@@ -280,32 +258,25 @@ export default function ItemForm({ categories, item, defaultCategoryId, nextPosi
         {/* Availability */}
         <div className="flex items-center gap-3">
           <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.is_available}
-              onChange={e => update('is_available', e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-10 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+            <input type="checkbox" checked={form.is_available}
+              onChange={e => update('is_available', e.target.checked)} className="sr-only peer" />
+            <div className="w-10 h-6 bg-lp-surface2 border border-lp-border rounded-full relative
+              peer-checked:bg-lp-accent/20 peer-checked:border-lp-accent/50 transition-all
+              after:content-[''] after:absolute after:top-[3px] after:left-[3px]
+              after:bg-lp-muted after:rounded-full after:h-4 after:w-4 after:transition-all
+              peer-checked:after:translate-x-4 peer-checked:after:bg-lp-accent" />
           </label>
-          <span className="text-sm text-gray-700 dark:text-gray-300">Հասանելի է պատվիրելու համար</span>
+          <span className="text-sm text-lp-text">{t.dAvailable}</span>
         </div>
 
         {/* Buttons */}
         <div className="flex gap-2 pt-1">
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium disabled:opacity-50 transition-colors shadow-sm"
-          >
-            {saving ? 'Պահպանում...' : item ? 'Թարմացնել' : 'Ավելացնել'}
+          <button type="submit" disabled={saving} className="lp-btn-primary px-5 py-2.5 text-sm disabled:opacity-50">
+            {saving ? t.dSaving : item ? t.dUpdate : t.dCreate}
           </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2.5 rounded-xl text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            Չեղարկել
+          <button type="button" onClick={onCancel}
+            className="px-4 py-2.5 rounded-xl text-sm text-lp-muted border border-lp-border hover:bg-white/[.04] hover:text-lp-text transition-colors">
+            {t.dCancel}
           </button>
         </div>
       </form>

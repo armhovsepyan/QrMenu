@@ -142,3 +142,8 @@ $$ language plpgsql security definer;
 create or replace trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Role grants (required for RLS to work — PostgREST uses these roles)
+grant usage on schema public to anon, authenticated;
+grant select on public.menus, public.categories, public.items to anon;
+grant all on public.menus, public.categories, public.items, public.users to authenticated;

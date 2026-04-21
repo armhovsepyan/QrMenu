@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
 import ItemForm from '@/components/dashboard/ItemForm'
 import ItemCard from '@/components/dashboard/ItemCard'
+import { useDashboardLang } from '@/lib/dashboard-lang'
 
 type Category = { id: string; name_ru: string }
 type Item = {
@@ -27,6 +28,7 @@ type Item = {
 
 export default function ItemsPage() {
   const { id } = useParams<{ id: string }>()
+  const { t } = useDashboardLang()
   const [categories, setCategories] = useState<Category[]>([])
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,11 +53,11 @@ export default function ItemsPage() {
   }
 
   async function deleteItem(itemId: string) {
-    if (!confirm('Ջնջե՞լ ապրանքը:')) return
+    if (!confirm(t.dDeleteItemConfirm)) return
     const supabase = createClient()
     await supabase.from('items').delete().eq('id', itemId)
     setItems(prev => prev.filter(i => i.id !== itemId))
-    toast.success('Ապրանքը ջնջված է')
+    toast.success(t.dItemDeleted)
   }
 
   async function toggleAvailable(item: Item) {
@@ -100,7 +102,7 @@ export default function ItemsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-7 h-7 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-7 h-7 border-2 border-lp-accent border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -108,15 +110,15 @@ export default function ItemsPage() {
   if (categories.length === 0) {
     return (
       <div className="p-8 max-w-2xl mx-auto anim-fade-in">
-        <Link href={`/dashboard/menu/${id}`} className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-          ← Կատալոգի կարգավորումներ
+        <Link href={`/dashboard/menu/${id}`} className="text-sm text-lp-muted hover:text-lp-text transition-colors">
+          ← {t.dCatalogSettings}
         </Link>
-        <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-12 text-center mt-4 anim-pop-in delay-1">
+        <div className="bg-lp-surface border border-lp-border rounded-2xl p-12 text-center mt-4 anim-pop-in delay-1">
           <div className="text-4xl mb-3">📂</div>
-          <p className="text-gray-900 dark:text-white font-medium mb-1">Նախ ստեղծեք կատեգորիաներ</p>
-          <p className="text-gray-400 dark:text-gray-500 text-sm mb-4">Ապրանքները ավելացվում են կատեգորիաներում</p>
-          <Link href={`/dashboard/menu/${id}/categories`} className="text-sm bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl transition-colors">
-            Անցնել կատեգորիաներ
+          <p className="text-lp-text font-medium mb-1">{t.dNeedCategories}</p>
+          <p className="text-lp-muted text-sm mb-4">{t.dNeedCategoriesSub}</p>
+          <Link href={`/dashboard/menu/${id}/categories`} className="lp-btn-primary text-sm px-4 py-2.5">
+            {t.dGoToCategories}
           </Link>
         </div>
       </div>
@@ -128,19 +130,19 @@ export default function ItemsPage() {
       <div className="max-w-3xl mx-auto">
 
         <div className="mb-6 anim-fade-in-up delay-0">
-          <Link href={`/dashboard/menu/${id}`} className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            ← Կատալոգի կարգավորումներ
+          <Link href={`/dashboard/menu/${id}`} className="text-sm text-lp-muted hover:text-lp-text transition-colors">
+            ← {t.dCatalogSettings}
           </Link>
           <div className="flex items-center justify-between mt-2">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Ապրանքներ</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight text-lp-text">{t.dItems}</h1>
             <button
               onClick={() => { setEditingItem(null); setShowForm(true) }}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-sm"
+              className="lp-btn-primary flex items-center gap-2 px-4 py-2.5 text-sm"
             >
               <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                 <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
               </svg>
-              Ավելացնել ապրանք
+              {t.dAddItem}
             </button>
           </div>
         </div>
@@ -151,22 +153,21 @@ export default function ItemsPage() {
             onClick={() => setSelectedCategory('all')}
             className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${
               selectedCategory === 'all'
-                ? 'bg-orange-500 text-white shadow-sm'
-                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                ? 'text-white'
+                : 'bg-lp-surface border border-lp-border text-lp-muted hover:text-lp-text hover:bg-white/[.04]'
             }`}
+            style={selectedCategory === 'all' ? { background: 'linear-gradient(135deg,#4f8ef7,#8b5cf6)' } : {}}
           >
-            Բոլորը ({items.length})
+            {t.dAll} ({items.length})
           </button>
           {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
+            <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
               className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${
                 selectedCategory === cat.id
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'text-white'
+                  : 'bg-lp-surface border border-lp-border text-lp-muted hover:text-lp-text hover:bg-white/[.04]'
               }`}
-            >
+              style={selectedCategory === cat.id ? { background: 'linear-gradient(135deg,#4f8ef7,#8b5cf6)' } : {}}>
               {cat.name_ru} ({items.filter(i => i.category_id === cat.id).length})
             </button>
           ))}
@@ -188,9 +189,9 @@ export default function ItemsPage() {
 
         {/* Items */}
         {filteredItems.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-12 text-center anim-pop-in delay-2">
+          <div className="bg-lp-surface border border-lp-border rounded-2xl p-12 text-center anim-pop-in delay-2">
             <div className="text-4xl mb-3">📦</div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Այս կատեգորիայում ապրանք չկա</p>
+            <p className="text-lp-muted text-sm">{t.dNoItems}</p>
           </div>
         ) : (
           <div className="space-y-3">

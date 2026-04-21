@@ -58,57 +58,38 @@ export default function CategoryForm({ menuId, category, nextPosition, onSaved, 
     setSaving(false)
   }
 
-  const inputClass = "w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 dark:focus:ring-orange-500 transition-shadow"
-
   return (
-    <div className="bg-white dark:bg-gray-800 border border-orange-100 dark:border-orange-500/30 rounded-2xl p-6 shadow-sm">
-      <h2 className="font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-lp-surface border border-lp-accent/30 rounded-2xl p-6" style={{ boxShadow: '0 8px 40px rgba(0,0,0,.3)' }}>
+      <h2 className="font-semibold text-lp-text mb-4">
         {category ? 'Խմբագրել կատեգորիան' : 'Նոր կատեգորիա'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-1 gap-3">
-          <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Անվանում (RU) *</label>
-            <input
-              value={form.name_ru}
-              onChange={e => setForm({ ...form, name_ru: e.target.value })}
-              placeholder="Горячие блюда"
-              required
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Անվանում (HY)</label>
-            <input
-              value={form.name_hy}
-              onChange={e => setForm({ ...form, name_hy: e.target.value })}
-              placeholder="Տաք ուտեստներ"
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Անվանում (EN)</label>
-            <input
-              value={form.name_en}
-              onChange={e => setForm({ ...form, name_en: e.target.value })}
-              placeholder="Hot dishes"
-              className={inputClass}
-            />
-          </div>
+          {[
+            { key: 'name_ru', label: 'Անվանում (RU) *', placeholder: 'Горячие блюда' },
+            { key: 'name_hy', label: 'Անվանում (HY)', placeholder: 'Տաք ուտեստներ' },
+            { key: 'name_en', label: 'Անվանում (EN)', placeholder: 'Hot dishes' },
+          ].map(({ key, label, placeholder }) => (
+            <div key={key}>
+              <label className="block text-xs text-lp-muted mb-1">{label}</label>
+              <input
+                value={form[key as keyof typeof form]}
+                onChange={e => setForm({ ...form, [key]: e.target.value })}
+                placeholder={placeholder}
+                required={key === 'name_ru'}
+                className="w-full px-3 py-2 rounded-lg text-sm bg-lp-surface2 border border-lp-border text-lp-text placeholder-lp-muted outline-none transition-all"
+                onFocus={e => e.currentTarget.style.borderColor = '#4f8ef7'}
+                onBlur={e => e.currentTarget.style.borderColor = '#1f2435'}
+              />
+            </div>
+          ))}
         </div>
         <div className="flex gap-2 pt-1">
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-          >
+          <button type="submit" disabled={saving} className="lp-btn-primary px-4 py-2 text-sm disabled:opacity-50">
             {saving ? 'Պահպանում...' : category ? 'Թարմացնել' : 'Ավելացնել'}
           </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
+          <button type="button" onClick={onCancel}
+            className="px-4 py-2 rounded-lg text-sm text-lp-muted border border-lp-border hover:bg-white/[.04] hover:text-lp-text transition-colors">
             Չեղարկել
           </button>
         </div>

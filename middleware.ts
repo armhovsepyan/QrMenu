@@ -31,7 +31,10 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // getSession reads the JWT from cookies locally — no network call.
+  // getUser() hits the auth server, which is unreachable as "localhost" inside Docker.
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user ?? null
 
   const pathname = request.nextUrl.pathname
 

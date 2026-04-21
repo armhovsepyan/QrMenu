@@ -35,7 +35,7 @@ export default function RegisterPage() {
     if (data.user) {
       await supabase.from('users').update({ restaurant_name: restaurantName }).eq('id', data.user.id)
     }
-    toast.success('Հաշիվը ստեղծված է! Ստուգեք email-ը հաստատման համար:')
+    toast.success(t.registerSuccess)
     router.push('/dashboard')
     setLoading(false)
   }

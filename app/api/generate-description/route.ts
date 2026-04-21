@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { generateMenuDescriptions } from '@/lib/anthropic'
 
 export async function POST(request: Request) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: 'AI-генерация отключена: ANTHROPIC_API_KEY не задан' }, { status: 503 })
+  }
+
   try {
     const body = await request.json()
     const { name_ru, name_hy, name_en } = body

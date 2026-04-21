@@ -2,11 +2,14 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import PublicMenu from '@/components/menu/PublicMenu'
 
+export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+
 type Props = { params: { slug: string } }
 
 async function getMenuData(slug: string) {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_INTERNAL_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
