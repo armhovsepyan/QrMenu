@@ -1,155 +1,145 @@
-# QR Menu
+# QR Catalog
 
-Multilingual QR-code menu builder built with Next.js 14, Supabase (self-hosted), and Tailwind CSS.
+Multilingual QR-code menu builder — Next.js 14, self-hosted Supabase, Tailwind CSS.
 
 ---
 
-## Запуск после перезагрузки ПК
+## После клонирования (первый запуск)
 
-### 1. Убедись, что Docker Desktop запущен
+### Требования
 
-Найди иконку Docker в системном трее. Если не запущен — открой Docker Desktop и дождись, пока он полностью загрузится.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — запущен и работает
+- [Node.js](https://nodejs.org/) 18+ — только для dev-режима
 
-### 2. Запусти бэкенд
+### 1. Создай файл `.env`
+
+`.env` не хранится в репозитории. Нужно создать его вручную.
+
+**Вариант A — сгенерировать новые ключи автоматически:**
 
 ```bash
-cd F:\Temp\qrmenu
+node scripts/generate-keys.mjs
+```
+
+Скрипт выведет готовые строки — скопируй их в новый файл `.env`.
+
+**Вариант B — создать `.env` вручную:**
+
+```bash
+cp .env.example .env
+```
+
+Затем открой `.env` и заполни значения:
+
+- `POSTGRES_PASSWORD` — любой длинный случайный пароль
+- `JWT_SECRET` — длинная случайная строка (минимум 32 символа)
+- `ANON_KEY` и `SERVICE_ROLE_KEY` — JWT токены, сгенерированные из `JWT_SECRET` (используй скрипт выше)
+
+### 2. Обнови `docker/db/zz-set-passwords.sql`
+
+В этом файле пароль DB захардкожен. Замени его на значение `POSTGRES_PASSWORD` из твоего `.env`:
+
+```sql
+-- строки 5, 6, 7 в файле docker/db/zz-set-passwords.sql
+CREATE ROLE supabase_auth_admin    ... PASSWORD 'ВАШ_POSTGRES_PASSWORD';
+CREATE ROLE supabase_storage_admin ... PASSWORD 'ВАШ_POSTGRES_PASSWORD';
+CREATE ROLE authenticator          ... PASSWORD 'ВАШ_POSTGRES_PASSWORD';
+```
+
+### 3. Запусти проект
+
+```bash
+docker compose up -d --build
+```
+
+Первый запуск занимает 2–3 минуты (сборка Next.js образа).
+
+### 4. Открой приложение
+
+**http://localhost:3000**
+
+Перейди на `/auth/register` и создай аккаунт.
+
+---
+
+## Ежедневный запуск (после перезагрузки ПК)
+
+```bash
 docker compose up -d
 ```
 
-Это запустит PostgreSQL, GoTrue (auth), PostgREST, Storage API и Kong. Подожди ~30–60 секунд.
-
-Проверь, что всё работает:
-
-```bash
-docker compose ps
-```
-
-Все сервисы должны быть в статусе `running`. Контейнер `db-migrations` будет `exited` — это нормально.
-
-### 3. Открой приложение
-
-Приложение уже работает в Docker на **http://localhost:3000**
-
-Если нужен режим разработки (с hot-reload):
-
-```bash
-npm run dev
-```
+Открой Docker Desktop → убедись что он запущен, затем выполни команду.
 
 ---
 
-## Важно: как правильно останавливать проект
-
-Перед выключением ПК **всегда останавливай контейнеры командой**:
+## Остановка
 
 ```bash
 docker compose down
 ```
 
-> Если просто выключить ПК без этой команды, Docker может пересоздать тома при следующем запуске — **все данные базы данных (пользователи, меню) будут удалены**.
+> Данные БД хранятся в `./data/postgres/` на диске — они переживают перезапуск.  
+> Никогда не удаляй папку `data/` вручную, если не хочешь потерять все данные.
 
 ---
 
-## Если логин не работает после перезагрузки
-
-Это значит, что база данных была пересоздана и все пользователи удалены. Нужно зарегистрироваться заново:
-
-1. Перейди на **http://localhost:3000/auth/register**
-2. Создай новый аккаунт
-3. Войди и создай меню заново
-
-Чтобы проверить, не пересоздался ли том БД, выполни:
+## Dev-режим (с hot-reload)
 
 ```bash
-docker volume ls | grep db-data
+npm install       # один раз
+npm run dev       # запускает Next.js на localhost:3000
 ```
 
-Если том есть — данные сохранены. Если тома нет — БД пустая.
+Бэкенд (Docker) должен быть запущен отдельно.
 
 ---
 
-## Первый запуск (с нуля)
+## Структура `.env`
 
-### Требования
-
-- [Node.js](https://nodejs.org/) 18+
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-
-### Установка
-
-```bash
-# 1. Перейди в папку проекта
-cd F:\Temp\qrmenu
-
-# 2. Установи зависимости
-npm install
-
-# 3. Запусти бэкенд
-docker compose up -d
-
-# 4. Запусти фронтенд (dev-режим)
-npm run dev
-```
-
-Открой **http://localhost:3000** и зарегистрируй аккаунт на `/auth/register`.
-
----
-
-## Переменные окружения
-
-| Файл | Назначение |
-|------|-----------|
-| `.env` | Секреты для Docker Compose (JWT, пароль БД, ключи Supabase) |
-| `.env.local` | Переменные для Next.js (URL Supabase, ключи, Anthropic API key) |
-
-Если `.env.local` отсутствует — скопируй пример и заполни значениями из `.env`:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:8000
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<ANON_KEY из .env>
-SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY из .env>
-ANTHROPIC_API_KEY=sk-ant-...
-```
+| Переменная | Назначение |
+|---|---|
+| `POSTGRES_PASSWORD` | Пароль для всех сервисных аккаунтов PostgreSQL |
+| `JWT_SECRET` | Секрет подписи всех JWT токенов |
+| `ANON_KEY` | Публичный JWT (роль `anon`) |
+| `SERVICE_ROLE_KEY` | Серверный JWT (обходит RLS) |
+| `ANTHROPIC_API_KEY` | Опционально — AI-генерация описаний |
 
 ---
 
 ## Команды разработки
 
 ```bash
-npm run dev      # dev-сервер на http://localhost:3000
-npm run build    # production-сборка (включает проверку типов)
+npm run dev      # dev-сервер http://localhost:3000
+npm run build    # production-сборка + проверка типов
 npm run lint     # ESLint
-npx tsc --noEmit # проверка типов без сборки
+npx tsc --noEmit # только проверка типов
 ```
 
 ---
 
-## Архитектура
-
-**Next.js 14 App Router** + Tailwind CSS + локальный Supabase (Docker).
-
-### Маршруты
+## Маршруты
 
 | Путь | Назначение |
-|------|-----------|
-| `/` | Публичная лендинг-страница |
+|---|---|
+| `/` | Лендинг |
 | `/auth/login`, `/auth/register` | Авторизация |
-| `/dashboard` | Список меню (защищено) |
-| `/dashboard/menu/[id]` | Настройки меню (название, slug, цвет, логотип) |
-| `/dashboard/menu/[id]/categories` | Управление категориями |
-| `/dashboard/menu/[id]/items` | Управление блюдами |
-| `/dashboard/menu/[id]/qr` | Скачать QR-код |
-| `/menu/[slug]` | Публичная страница меню (без авторизации) |
+| `/dashboard` | Список каталогов (защищено) |
+| `/dashboard/menu/[id]` | Настройки каталога |
+| `/dashboard/menu/[id]/categories` | Категории |
+| `/dashboard/menu/[id]/items` | Товары |
+| `/dashboard/menu/[id]/qr` | QR-код |
+| `/menu/[slug]` | Публичная страница (без авторизации) |
 | `/menu/demo` | Демо без Supabase |
 
-### Docker-сервисы
+---
+
+## Docker-сервисы
 
 | Контейнер | Назначение | Порт |
-|-----------|-----------|------|
+|---|---|---|
 | `db` | PostgreSQL 15 | 5432 |
 | `auth` | GoTrue (авторизация) | — |
 | `rest` | PostgREST (REST API) | — |
-| `storage` | Supabase Storage (файлы) | — |
+| `storage` | Supabase Storage | — |
 | `kong` | API Gateway | 8000 |
 | `qrmenu` | Next.js приложение | 3000 |
