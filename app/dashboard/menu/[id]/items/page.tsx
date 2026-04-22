@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase'
 import ItemForm from '@/components/dashboard/ItemForm'
 import ItemCard from '@/components/dashboard/ItemCard'
 import { useDashboardLang } from '@/lib/dashboard-lang'
+import { IconPlus } from '@/components/icons'
 
 type Category = { id: string; name_ru: string }
 type Item = {
@@ -139,9 +140,7 @@ export default function ItemsPage() {
               onClick={() => { setEditingItem(null); setShowForm(true) }}
               className="lp-btn-primary flex items-center gap-2 px-4 py-2.5 text-sm"
             >
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
+              <IconPlus />
               {t.dAddItem}
             </button>
           </div>

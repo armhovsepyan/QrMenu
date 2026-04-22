@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
 import CategoryForm from '@/components/dashboard/CategoryForm'
 import { useDashboardLang } from '@/lib/dashboard-lang'
+import { IconPlus, IconChevronUp, IconChevronDown } from '@/components/icons'
 
 type Category = {
   id: string
@@ -92,9 +93,7 @@ export default function CategoriesPage() {
               onClick={() => { setEditingCat(null); setShowForm(true) }}
               className="lp-btn-primary flex items-center gap-2 px-4 py-2.5 text-sm"
             >
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
+              <IconPlus />
               {t.dAddCategory}
             </button>
           </div>
@@ -134,11 +133,11 @@ export default function CategoriesPage() {
                 <div className="flex items-center gap-1">
                   <button onClick={() => moveCategory(cat.id, 'up')} disabled={idx === 0}
                     className="p-1.5 text-lp-muted hover:text-lp-text disabled:opacity-25 transition-colors rounded-lg hover:bg-white/[.04]">
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" /></svg>
+                    <IconChevronUp />
                   </button>
                   <button onClick={() => moveCategory(cat.id, 'down')} disabled={idx === categories.length - 1}
                     className="p-1.5 text-lp-muted hover:text-lp-text disabled:opacity-25 transition-colors rounded-lg hover:bg-white/[.04]">
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    <IconChevronDown />
                   </button>
                   <button onClick={() => { setEditingCat(cat); setShowForm(false) }}
                     className="text-xs border border-lp-border px-3 py-1.5 rounded-lg text-lp-muted hover:text-lp-text hover:bg-white/[.04] ml-1 transition-colors">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useDashboardLang } from '@/lib/dashboard-lang'
+import { IconChevronUp, IconChevronDown } from '@/components/icons'
 
 type Item = {
   id: string
@@ -52,11 +53,11 @@ export default function ItemCard({ item, isFirst, isLast, onEdit, onDelete, onTo
       <div className="flex items-center gap-1 flex-shrink-0">
         <button onClick={() => onMove('up')} disabled={isFirst}
           className="p-1.5 text-lp-muted hover:text-lp-text disabled:opacity-25 transition-colors rounded-lg hover:bg-white/[.04]">
-          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" /></svg>
+          <IconChevronUp />
         </button>
         <button onClick={() => onMove('down')} disabled={isLast}
           className="p-1.5 text-lp-muted hover:text-lp-text disabled:opacity-25 transition-colors rounded-lg hover:bg-white/[.04]">
-          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+          <IconChevronDown />
         </button>
         <button onClick={onToggleAvailable}
           className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ml-1 ${

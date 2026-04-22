@@ -61,6 +61,8 @@ export const T = {
     hasAccount: 'Already have an account?',
     toLogin: 'Sign in',
     minPassword: 'At least 6 characters',
+    confirmPasswordLabel: 'Confirm password',
+    passwordMismatch: 'Passwords do not match',
     registerSuccess: 'Account created! Welcome 🎉',
 
     // dashboard
@@ -209,6 +211,8 @@ export const T = {
     hasAccount: 'Уже есть аккаунт?',
     toLogin: 'Войти',
     minPassword: 'Минимум 6 символов',
+    confirmPasswordLabel: 'Подтвердите пароль',
+    passwordMismatch: 'Пароли не совпадают',
     registerSuccess: 'Аккаунт создан! Добро пожаловать 🎉',
 
     // dashboard
@@ -357,6 +361,8 @@ export const T = {
     hasAccount: 'Արդեն հաշիվ ունե՞ք:',
     toLogin: 'Մուտք',
     minPassword: 'Նվազագույնը 6 նիշ',
+    confirmPasswordLabel: 'Հաստատեք գաղտնաբառը',
+    passwordMismatch: 'Գաղտնաբառերը չեն համընկնում',
     registerSuccess: 'Հաշիվը ստեղծված է! Բարի գալուստ 🎉',
 
     // dashboard

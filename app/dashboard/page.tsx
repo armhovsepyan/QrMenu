@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
 import { useDashboardLang } from '@/lib/dashboard-lang'
+import { IconPlus, IconX, IconExternalLink, IconQrCode, IconPencil, IconTrash } from '@/components/icons'
 
 type Menu = {
   id: string
@@ -114,9 +115,7 @@ export default function DashboardPage() {
             onClick={() => setShowForm(v => !v)}
             className="lp-btn-primary flex items-center gap-2 px-4 py-2.5 text-sm"
           >
-            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
+            <IconPlus />
             <span>{t.dCreateCatalog}</span>
           </button>
         </div>
@@ -137,9 +136,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-semibold" style={{ color: 'var(--lp-text, #e8ecf4)' }}>{t.dNewCatalog}</h2>
               <button onClick={() => setShowForm(false)} className="p-1 rounded-lg transition-colors" style={{ color: 'var(--lp-muted, #6b7a99)' }}>
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
+                <IconX />
               </button>
             </div>
             <form onSubmit={createMenu} className="space-y-4">
@@ -212,10 +209,7 @@ export default function DashboardPage() {
                     style={{ color: 'var(--lp-muted, #6b7a99)', borderColor: 'var(--lp-border, #1f2435)' }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,.04)'; e.currentTarget.style.color = 'var(--lp-text, #e8ecf4)' }}
                     onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.color = 'var(--lp-muted, #6b7a99)' }}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                      <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                      <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                    </svg>
+                    <IconExternalLink className="w-3 h-3" />
                     <span>{t.dView}</span>
                   </Link>
                   <Link href={`/dashboard/menu/${menu.id}/qr`}
@@ -223,10 +217,7 @@ export default function DashboardPage() {
                     style={{ color: 'var(--lp-muted, #6b7a99)', borderColor: 'var(--lp-border, #1f2435)' }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,.04)'; e.currentTarget.style.color = 'var(--lp-text, #e8ecf4)' }}
                     onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.color = 'var(--lp-muted, #6b7a99)' }}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clipRule="evenodd" />
-                      <path d="M11 4a1 1 0 10-2 0v1a1 1 0 002 0V4zM10 7a1 1 0 011 1v1h2a1 1 0 110 2h-3a1 1 0 01-1-1V8a1 1 0 011-1zM16 9a1 1 0 100 2 1 1 0 000-2zM9 13a1 1 0 011-1h1a1 1 0 110 2v2a1 1 0 11-2 0v-3zM15 13a1 1 0 10-2 0v3a1 1 0 102 0v-3zM11 19a1 1 0 100-2h-1a1 1 0 100 2h1z" />
-                    </svg>
+                    <IconQrCode className="w-3 h-3" />
                     <span>QR</span>
                   </Link>
                   <Link href={`/dashboard/menu/${menu.id}`}
@@ -234,9 +225,7 @@ export default function DashboardPage() {
                     style={{ background: 'rgba(79,142,247,.1)', border: '1px solid rgba(79,142,247,.2)' }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(79,142,247,.2)' }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'rgba(79,142,247,.1)' }}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
+                    <IconPencil className="w-3 h-3" />
                     <span>{t.dEdit}</span>
                   </Link>
                   <button onClick={() => deleteMenu(menu.id)}
@@ -244,9 +233,7 @@ export default function DashboardPage() {
                     style={{ color: '#f87171', borderColor: 'rgba(239,68,68,.2)' }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,.08)' }}
                     onMouseLeave={e => { e.currentTarget.style.background = '' }}>
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
+                    <IconTrash className="w-3 h-3" />
                     <span>{t.dDelete}</span>
                   </button>
                 </div>

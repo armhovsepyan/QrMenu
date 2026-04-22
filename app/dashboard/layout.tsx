@@ -5,21 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 import { DashboardLangProvider, useDashboardLang } from '@/lib/dashboard-lang'
-
-function IconGrid() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-      <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-    </svg>
-  )
-}
-function IconLogout() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-      <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 000-2H4V5h7a1 1 0 000-2H3zm10.293 4.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L14.586 11H7a1 1 0 110-2h7.586l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
-    </svg>
-  )
-}
+import { IconGrid, IconLogout } from '@/components/icons'
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
