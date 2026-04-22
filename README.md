@@ -11,42 +11,15 @@ Multilingual QR-code menu builder — Next.js 14, self-hosted Supabase, Tailwind
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) — запущен и работает
 - [Node.js](https://nodejs.org/) 18+ — только для dev-режима
 
-### 1. Создай файл `.env`
-
-`.env` не хранится в репозитории. Нужно создать его вручную.
-
-**Вариант A — сгенерировать новые ключи автоматически:**
+### 1. Сгенерируй секреты и создай `.env`
 
 ```bash
-node scripts/generate-keys.mjs
+node scripts/setup.mjs
 ```
 
-Скрипт выведет готовые строки — скопируй их в новый файл `.env`.
+Скрипт автоматически создаст `.env` и обновит `docker/db/zz-set-passwords.sql`.
 
-**Вариант B — создать `.env` вручную:**
-
-```bash
-cp .env.example .env
-```
-
-Затем открой `.env` и заполни значения:
-
-- `POSTGRES_PASSWORD` — любой длинный случайный пароль
-- `JWT_SECRET` — длинная случайная строка (минимум 32 символа)
-- `ANON_KEY` и `SERVICE_ROLE_KEY` — JWT токены, сгенерированные из `JWT_SECRET` (используй скрипт выше)
-
-### 2. Обнови `docker/db/zz-set-passwords.sql`
-
-В этом файле пароль DB захардкожен. Замени его на значение `POSTGRES_PASSWORD` из твоего `.env`:
-
-```sql
--- строки 5, 6, 7 в файле docker/db/zz-set-passwords.sql
-CREATE ROLE supabase_auth_admin    ... PASSWORD 'ВАШ_POSTGRES_PASSWORD';
-CREATE ROLE supabase_storage_admin ... PASSWORD 'ВАШ_POSTGRES_PASSWORD';
-CREATE ROLE authenticator          ... PASSWORD 'ВАШ_POSTGRES_PASSWORD';
-```
-
-### 3. Запусти проект
+### 2. Запусти проект
 
 ```bash
 docker compose up -d --build
