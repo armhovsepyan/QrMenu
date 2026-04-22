@@ -4,34 +4,35 @@ Multilingual QR-code menu builder — Next.js 14, self-hosted Supabase, Tailwind
 
 ---
 
-## После клонирования (первый запуск)
-
-### Требования
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — запущен и работает
-- [Node.js](https://nodejs.org/) 18+ — только для dev-режима
-
-### 1. Сгенерируй секреты и создай `.env`
+## Быстрый старт после клонирования
 
 ```bash
+git clone https://github.com/armhovsepyan/QrMenu.git
+cd QrMenu
 node scripts/setup.mjs
-```
-
-Скрипт автоматически создаст `.env` и обновит `docker/db/zz-set-passwords.sql`.
-
-### 2. Запусти проект
-
-```bash
 docker compose up -d --build
 ```
 
-Первый запуск занимает 2–3 минуты (сборка Next.js образа).
+Открой **http://localhost:3000/auth/register** и создай аккаунт.
 
-### 4. Открой приложение
+> Первый запуск занимает 2–3 минуты — идёт сборка Docker-образа.
 
-**http://localhost:3000**
+---
 
-Перейди на `/auth/register` и создай аккаунт.
+## Требования
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — должен быть запущен
+- [Node.js](https://nodejs.org/) 18+
+
+---
+
+## Что делает `setup.mjs`
+
+- Генерирует случайные `POSTGRES_PASSWORD`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`
+- Создаёт файл `.env` в корне проекта
+- Обновляет `docker/db/zz-set-passwords.sql` с новым паролем
+
+Если `.env` уже существует — скрипт ничего не трогает.
 
 ---
 
@@ -41,8 +42,6 @@ docker compose up -d --build
 docker compose up -d
 ```
 
-Открой Docker Desktop → убедись что он запущен, затем выполни команду.
-
 ---
 
 ## Остановка
@@ -51,16 +50,16 @@ docker compose up -d
 docker compose down
 ```
 
-> Данные БД хранятся в `./data/postgres/` на диске — они переживают перезапуск.  
-> Никогда не удаляй папку `data/` вручную, если не хочешь потерять все данные.
+> Данные БД хранятся в `./data/postgres/` — они переживают перезапуск.  
+> Не удаляй папку `data/` вручную, если не хочешь потерять все данные.
 
 ---
 
 ## Dev-режим (с hot-reload)
 
 ```bash
-npm install       # один раз
-npm run dev       # запускает Next.js на localhost:3000
+npm install
+npm run dev
 ```
 
 Бэкенд (Docker) должен быть запущен отдельно.
@@ -75,7 +74,7 @@ npm run dev       # запускает Next.js на localhost:3000
 | `JWT_SECRET` | Секрет подписи всех JWT токенов |
 | `ANON_KEY` | Публичный JWT (роль `anon`) |
 | `SERVICE_ROLE_KEY` | Серверный JWT (обходит RLS) |
-| `ANTHROPIC_API_KEY` | Опционально — AI-генерация описаний |
+| `ANTHROPIC_API_KEY` | Опционально — AI-генерация описаний товаров |
 
 ---
 
